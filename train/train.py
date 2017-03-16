@@ -93,16 +93,12 @@ def train_model_iteration(projectroot, project, iteration):
             # TODO: None or NaN?
             try:
                 feature_data[i][j] = d.get(featkey)
-
             except ValueError:
                 print(featkey)
                 raise
 
-         #print("\n Nupur "+str(i)+ " ")
-
     # TODO: We should do normalize/gaussianize here, because we have the data in a np array
     # and can use np methods to do it quickly
-
 
     print("verifying data")
     mbids = list(data.keys())
