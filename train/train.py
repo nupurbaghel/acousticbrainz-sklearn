@@ -5,9 +5,8 @@ import json
 import yaml
 import os
 import pickle
-
-from train import transform
-
+import transform
+from transforms import removevl
 
 def load_and_filter_descriptors(filelist, filterdesc, preprocessing):
     """ Load a project filelist and perform transformations
@@ -20,8 +19,11 @@ def load_and_filter_descriptors(filelist, filterdesc, preprocessing):
     pre = preprocessing[filterdesc]
     print(pre)
     # TODO: If remove or include are first transforms, do them on load
-    for k, path in filelist.items():
-        data = json.load(open(path))
+    # Created a list of json-files and removed variable length params
+    # The list is converted back into dictionary and passed for further transformations
+    data_list = [(index, json.load(open(path))) for index, path in filelist.items()]
+    data_list = removevl.RemoveVariableLength().transform(data_list)
+    for k, data in data_list:
         tr = transform.transform(data, pre)
         ret[k] = tr
 
@@ -91,12 +93,16 @@ def train_model_iteration(projectroot, project, iteration):
             # TODO: None or NaN?
             try:
                 feature_data[i][j] = d.get(featkey)
+
             except ValueError:
                 print(featkey)
                 raise
 
+         #print("\n Nupur "+str(i)+ " ")
+
     # TODO: We should do normalize/gaussianize here, because we have the data in a np array
     # and can use np methods to do it quickly
+
 
     print("verifying data")
     mbids = list(data.keys())
